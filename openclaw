@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+PYTHON_BIN="${OPENCLAW_PYTHON:-python3}"
+CLI_SCRIPT="${SCRIPT_DIR}/opend_cli.py"
+
+if [[ ! -f "$CLI_SCRIPT" ]]; then
+  echo "openclaw: missing $CLI_SCRIPT" >&2
+  exit 1
+fi
+
+DEFAULT_ARGS=()
+[[ -n "${OPEND_HOST:-}" ]] && DEFAULT_ARGS+=(--host "$OPEND_HOST")
+[[ -n "${OPEND_PORT:-}" ]] && DEFAULT_ARGS+=(--port "$OPEND_PORT")
+[[ -n "${OPEND_MARKET:-}" ]] && DEFAULT_ARGS+=(--market "$OPEND_MARKET")
+[[ -n "${OPEND_SECURITY_FIRM:-}" ]] && DEFAULT_ARGS+=(--security-firm "$OPEND_SECURITY_FIRM")
+[[ -n "${OPEND_TRD_ENV:-}" ]] && DEFAULT_ARGS+=(--trd-env "$OPEND_TRD_ENV")
+[[ -n "${OPEND_CREDENTIAL_METHOD:-}" ]] && DEFAULT_ARGS+=(--credential-method "$OPEND_CREDENTIAL_METHOD")
+[[ -n "${OPEND_OUTPUT:-}" ]] && DEFAULT_ARGS+=(--output "$OPEND_OUTPUT")
+
+if [[ $# -eq 0 ]]; then
+  exec "$PYTHON_BIN" "$CLI_SCRIPT" "${DEFAULT_ARGS[@]}" --help
+fi
+
+exec "$PYTHON_BIN" "$CLI_SCRIPT" "${DEFAULT_ARGS[@]}" "$@"
